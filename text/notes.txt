@@ -1,0 +1,7 @@
+Random Notes
+------------
+
+- This folder is used only for display/testing.
+- Files include Docker, Terraform, Ansible, and Jenkins examples.
+- Feel free to edit, break, or delete these as needed.
+- No real credentials or secrets are stored here.

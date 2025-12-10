@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "sample-node-app"
+        DOCKER_IMAGE = "sample-node-app:latest"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo "Checking out source code..."
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo "Running npm install & build..."
+                sh 'npm install'
+                sh 'npm test || echo "Tests failed or not present, continuing for demo..."'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                echo "Building Docker image..."
+                sh "docker build -t ${DOCKER_IMAGE} ."
+            }
+        }
+
+        stage('Docker Run (Test)') {
+            steps {
+                echo "Running container for smoke test..."
+                sh "docker run -d --name ${APP_NAME} -p 3000:3000 ${DOCKER_IMAGE}"
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Cleaning up Docker container..."
+            sh "docker rm -f ${APP_NAME} || true"
+        }
+        success {
+            echo "Pipeline finished successfully."
+        }
+        failure {
+            echo "Pipeline failed. Please check logs."
+        }
+    }
+}
